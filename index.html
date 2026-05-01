@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregnancy Tracker | UNFPA Philippines</title>
+    <style>
+        :root {
+            --hot-pink: #FF1493;
+            --deep-pink: #C71585;
+            --soft-pink: #FF69B4;
+            --white: #FFFFFF;
+            --lab-blue: #0072bc;
+            --tip-green: #27ae60;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(rgba(255, 20, 147, 0.45), rgba(255, 20, 147, 0.45)),
+                        url('https://images.unsplash.com/photo-1531983412531-1f49a365ffed?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            min-height: 100vh; display: flex; justify-content: center; align-items: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            max-width: 900px; width: 95%;
+            padding: 40px; border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border: 4px solid var(--hot-pink);
+            margin: 40px 20px;
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo { width: 180px; margin-bottom: 10px; }
+        h1 { color: var(--deep-pink); font-size: 2.2rem; margin: 0; text-transform: uppercase; font-weight: 800; }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-card {
+            background: #FFF0F5; padding: 25px; border-radius: 20px;
+            text-align: center; border: 1px solid var(--soft-pink);
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+
+        .input-card h2 { color: var(--deep-pink); margin: 0 0 10px 0; font-size: 1.4rem; border-bottom: 2px solid var(--soft-pink); padding-bottom: 10px; }
+        label { display: block; margin: 15px 0 10px 0; font-weight: 700; color: #444; font-size: 0.9rem; }
+        input[type="date"] { width: 100%; padding: 12px; border: 2px solid var(--hot-pink); border-radius: 12px; font-size: 1rem; text-align: center; box-sizing: border-box; }
+
+        .btn { background: linear-gradient(45deg, var(--hot-pink), var(--deep-pink)); color: white; border: none; padding: 15px; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 15px; transition: 0.3s; }
+        .btn:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4); }
+
+        .affirmation-hero { background: var(--hot-pink); color: white; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 30px; font-style: italic; font-weight: 600; display: none; animation: fadeIn 1s; }
+
+        .dashboard { display: none; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: white; border: 2px solid var(--hot-pink); padding: 15px; border-radius: 15px; text-align: center; }
+        .stat-value { font-size: 2.2rem; font-weight: 900; color: var(--deep-pink); }
+        
+        .results { display: none; }
+        .section-title { color: var(--deep-pink); font-size: 1.6rem; margin-top: 35px; font-weight: 700; border-bottom: 3px solid var(--soft-pink); padding-bottom: 8px; }
+
+        .visit-card {
+            background: white; margin: 15px 0; padding: 20px;
+            border-radius: 15px; border-left: 8px solid var(--hot-pink);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex; gap: 20px;
+        }
+
+        .visit-content { flex-grow: 1; }
+        .visit-header { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px;}
+        .visit-name { font-weight: 800; color: var(--deep-pink); font-size: 1rem; }
+        .visit-date { font-weight: 800; color: var(--hot-pink); }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .info-box { font-size: 0.85rem; line-height: 1.5; }
+        .info-label { font-weight: 700; display: block; text-transform: uppercase; font-size: 0.75rem; margin-bottom: 5px; }
+        
+        .lab-list { color: var(--lab-blue); margin: 0; padding-left: 15px; }
+        .tip-list { color: var(--tip-green); margin: 0; padding-left: 15px; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (max-width: 800px) {
+            .input-section, .dashboard, .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <img src="https://www.unfpa.org/sites/default/files/unfpa_logo.png" alt="UNFPA Logo" class="logo">
+        <h1>Pregnancy Tracker</h1>
+    </div>
+
+    <div class="input-section">
+        <div class="input-card">
+            <h2>Pag buntis</h2>
+            <label>Unang Araw ng Huling Regla (LMP):</label>
+            <input type="date" id="lmp">
+            <button class="btn" onclick="calculateByLMP()">Kalkulahin ang Journey</button>
+        </div>
+
+        <div class="input-card">
+            <h2>Nanganak na ako</h2>
+            <label>Petsa ng Panganganak:</label>
+            <input type="date" id="dod">
+            <button class="btn" onclick="calculateByDOD()">Tignan ang PNC Schedule</button>
+        </div>
+    </div>
+
+    <div id="affirmation" class="affirmation-hero"></div>
+
+    <div id="dashboard" class="dashboard">
+        <div class="stat-card" id="ancStatCard">
+            <div style="font-size:0.75rem; color:#777; font-weight:bold;">ANC COMPLIANCE</div>
+            <div class="stat-value" id="ancRate">0%</div>
+        </div>
+        <div class="stat-card">
+            <div style="font-size:0.75rem; color:#777; font-weight:bold;">PNC COMPLIANCE</div>
+            <div class="stat-value" id="pncRate">0%</div>
+        </div>
+    </div>
+
+    <div id="results" class="results">
+        <div id="ancSection">
+            <div class="section-title">Antenatal Care (Pregnancy)</div>
+            <div id="prenatalList"></div>
+        </div>
+
+        <div class="section-title">Postnatal Care (Recovery)</div>
+        <div id="postnatalList"></div>
+        
+        <div style="text-align:center; margin-top:40px; font-size:0.85rem; color:#888; border-top:1px solid #eee; padding-top:20px;">
+            Gabay para sa mga Filipina batay sa POGS at DOH Standards. <br>
+            &copy; 2026 UNFPA Philippines
+        </div>
+    </div>
+</div>
+
+<script>
+    const ancClinicalDetails = {
+        12: { 
+            labs: ["CBC with Platelet count", "Blood Typing & Rh Factor", "HBsAg (Hepa B screening)", "HIV & Syphilis screening (VDRL/RPR)", "Urinalysis (Midstream clean catch)"], 
+            tips: ["Simulan ang Folic Acid (400mcg/day) para sa brain ni baby.", "Iwasan ang hilaw na karne at isda.", "Mag-pabakuna ng Flu shot kung season."] 
+        },
+        20: { 
+            labs: ["Congenital Anomaly Scan (Level 2 Ultrasound)", "Blood Pressure monitoring", "Fundal height measurement"], 
+            tips: ["Dagdagan ang Iron & Calcium supplements.", "Mag-ehersisyo ng low-impact (walking/swimming).", "Simulan ang pagbabasa o pagkanta kay baby."] 
+        },
+        26: { 
+            labs: ["75g Oral Glucose Tolerance Test (OGTT)", "Hemoglobin & Hematocrit (to check for anemia)"], 
+            tips: ["Iwasan ang 'hidden sugars' sa puting kanin at softdrinks.", "Matulog sa kaliwang bahagi (left side) para sa blood flow."] 
+        },
+        30: { 
+            labs: ["Urinalysis (screening for Pre-eclampsia/Proteinuria)", "Fetal Doppler Heart Tone check"], 
+            tips: ["Bilangin ang sipa (10 kicks in 2 hours).", "Itaas ang paa kung nakararanas ng pamamanas (edema)."] 
+        },
+        34: { 
+            labs: ["Tetanus Toxoid vaccination (Tdap)", "Repeat CBC kung may anemia nung 2nd trim"], 
+            tips: ["Ihanda ang 'Go Bag' (Damit, PhilHealth, Birth Plan).", "Pag-aralan ang senyales ng 'Preterm Labor'."] 
+        },
+        36: { 
+            labs: ["Pelvic Exam (Bishop Score)", "GBS (Group B Strep) swab (kung recommended)", "Presentation Ultrasound"], 
+            tips: ["Mag-perineal massage upang maiwasan ang tear.", "Kumpletuhin ang mga gamit ni baby (diapers, clothes)."] 
+        },
+        38: { 
+            labs: ["Cervical assessment (IE)", "Fetal Heart Rate monitoring"], 
+            tips: ["I-monitor ang 'Bloody Show' o mucus plug.", "Siguraduhing may kasama sa bahay sa lahat ng oras."] 
+        },
+        40: { 
+            labs: ["Non-Stress Test (NST)", "Biophysical Profile (BPP Ultrasound)"], 
+            tips: ["Huwag kabahan; huminga nang malalim.", "Mag-squatting o gumamit ng birthing ball (kung pinayagan)."] 
+        }
+    };
+
+    const affirmations = [
+        "Ang galing mo, Mommy! Ang iyong katawan ay kamangha-mangha.",
+        "Bawat check-up ay isang hakbang patungo sa kaligtasan ninyo ni baby.",
+        "Karapat-dapat ka sa sapat na suporta at kalinga. Proud kami sa iyo!",
+        "Tiwala lang, Mommy. Strong ka para sa iyong pamilya.",
+        "Ang iyong dedikasyon sa iyong kalusugan ay ang unang regalo mo kay baby."
+    ];
+
+    function showAffirmation() {
+        const box = document.getElementById('affirmation');
+        box.innerHTML = affirmations[Math.floor(Math.random() * affirmations.length)];
+        box.style.display = 'block';
+    }
+
+    function calculateByLMP() {
+        const val = document.getElementById('lmp').value;
+        if (!val) return alert("Paki-pili ang LMP.");
+        const lmp = new Date(val);
+        const edd = new Date(lmp); edd.setDate(lmp.getDate() + 280);
+        renderANC(lmp); renderPNC(edd);
+        document.getElementById('ancSection').style.display = 'block';
+        document.getElementById('ancStatCard').style.display = 'block';
+        document.getElementById('dashboard').style.display = 'grid';
+        finalizeUI();
+    }
+
+    function calculateByDOD() {
+        const val = document.getElementById('dod').value;
+        if (!val) return alert("Paki-pili ang petsa ng panganganak.");
+        const dod = new Date(val);
+        renderPNC(dod);
+        document.getElementById('ancSection').style.display = 'none';
+        document.getElementById('ancStatCard').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'grid';
+        document.getElementById('dashboard').style.gridTemplateColumns = '1fr';
+        finalizeUI();
+    }
+
+    function finalizeUI() {
+        document.getElementById('results').style.display = 'block';
+        showAffirmation();
+        updateCompliance();
+        window.scrollTo({ top: document.getElementById('affirmation').offsetTop - 20, behavior: 'smooth' });
+    }
+
+    function renderANC(lmp) {
+        const list = document.getElementById('prenatalList');
+        list.innerHTML = '';
+        [12, 20, 26, 30, 34, 36, 38, 40].forEach((wk, i) => {
+            const d = new Date(lmp); d.setDate(lmp.getDate() + (wk * 7));
+            const detail = ancClinicalDetails[wk];
+            list.innerHTML += `<div class="visit-card">
+                <input type="checkbox" class="anc-check" onclick="updateCompliance()" style="width:25px; height:25px; accent-color:var(--hot-pink);">
+                <div class="visit-content">
+                    <div class="visit-header"><span class="visit-name">Bisita ${i+1} (Linggo ${wk})</span><span class="visit-date">${d.toLocaleDateString('fil-PH', {month:'short', day:'numeric', year:'numeric'})}</span></div>
+                    <div class="info-grid">
+                        <div class="info-box">
+                            <span class="info-label" style="color:var(--lab-blue)">🧪 Essential Labs</span>
+                            <ul class="lab-list">${detail.labs.map(l => `<li>${l}</li>`).join('')}</ul>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-label" style="color:var(--tip-green)">💡 Wellness Reminders</span>
+                            <ul class="tip-list">${detail.tips.map(t => `<li>${t}</li>`).join('')}</ul>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
+    }
+
+    function renderPNC(baseDate) {
+        const list = document.getElementById('postnatalList');
+        list.innerHTML = '';
+        const pncProtocols = [
+            { name: "Early Care (24 Hours)", labs: ["Lochia (bleeding) check", "Fundal height check", "Initiate Breastfeeding"], tips: ["Skin-to-skin contact (Kangaroo care).", "Iwasan ang 'manganay' o heavy lifting."] },
+            { name: "Day 3 (Transition)", labs: ["Baby: Newborn Screening", "Mom: Incision check (kung CS)"], tips: ["Siguraduhing sapat ang ihi ni baby (6-8 diapers/day).", "Uminom ng maraming tubig."] },
+            { name: "Week 2 (Healing)", labs: ["Newborn Hearing Test", "Mom: Postpartum Depression (EPDS) screening"], tips: ["Linisin ang pusod ni baby gamit ang alcohol.", "Huwag mahiya humingi ng tulong sa gawaing bahay."] },
+            { name: "Week 6 (Recovery)", labs: ["Pelvic exam", "Family Planning counseling"], tips: ["Pag-usapan ang contraceptives.", "Unti-unting bumalik sa light activities."] }
+        ];
+        [1, 3, 10, 42].forEach((day, i) => {
+            const d = new Date(baseDate); d.setDate(baseDate.getDate() + day);
+            const detail = pncProtocols[i];
+            list.innerHTML += `<div class="visit-card">
+                <input type="checkbox" class="pnc-check" onclick="updateCompliance()" style="width:25px; height:25px; accent-color:var(--hot-pink);">
+                <div class="visit-content">
+                    <div class="visit-header"><span class="visit-name">${detail.name}</span><span class="visit-date">${d.toLocaleDateString('fil-PH', {month:'short', day:'numeric', year:'numeric'})}</span></div>
+                    <div class="info-grid">
+                        <div class="info-box">
+                            <span class="info-label" style="color:var(--lab-blue)">🧪 Clinical Checks</span>
+                            <ul class="lab-list">${detail.labs.map(l => `<li>${l}</li>`).join('')}</ul>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-label" style="color:var(--tip-green)">💡 Recovery Tips</span>
+                            <ul class="tip-list">${detail.tips.map(t => `<li>${t}</li>`).join('')}</ul>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
+    }
+
+    function updateCompliance() {
+        const calc = (cls) => {
+            const items = document.querySelectorAll(cls);
+            if (items.length === 0) return 0;
+            return Math.round((Array.from(items).filter(i => i.checked).length / items.length) * 100);
+        };
+        document.getElementById('ancRate').innerText = calc('.anc-check') + "%";
+        document.getElementById('pncRate').innerText = calc('.pnc-check') + "%";
+    }
+</script>
+
+</body>
+</html>
